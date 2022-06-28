@@ -31,7 +31,7 @@ const promptUser = () => {
       message: 'Please select an option:',
       choices: [
         'View All Employees',
-        'View All Roles',
+        'View All Employees By Role',
         'View All Departments',
         'View All Employees By Department',
         'View Department Budgets',
@@ -48,15 +48,15 @@ const promptUser = () => {
     }
   ])
     .then((answer) => {
-      switch (answer.action) {
+      switch (answer.mainmenu) {
         case "View All Employees":
-          viewAllEmp();
+          viewAllEmployees();
           break;
         case "View All Employees By Department":
           viewAllEmpByDept();
           break;
         case "View All Employees By Role":
-          viewAllEmpByRole();
+          viewAllRoles();
           break;
         case "Add Employee":
           addEmp();
@@ -95,5 +95,33 @@ const promptUser = () => {
     });
 };
 
-promptUser();
+const viewAllEmployees = () => {
+  const queryText = `SELECT employee.id, 
+    employee.first_name, 
+    employee.last_name, 
+    role.title, 
+    department.name AS 'department', 
+    role.salary
+    FROM employee, role, department 
+    WHERE department.id = role.department_id 
+    AND role.id = employee.role_id
+    ORDER BY employee.id ASC`;
+  db.query(queryText, (error, results) => {
+    if (error) throw error;
+    console.table(results);
+    promptUser();
+  });
+};
 
+const viewAllRoles = () => {
+  const queryText = `SELECT role.id, role.title, department.name AS department
+  FROM role
+  INNER JOIN department ON role.department_id = department.id`;
+  db.query(queryText, (error, results) => {
+    if (error) throw error;
+    console.table(results);
+    promptUser();
+  });
+};
+
+promptUser();
