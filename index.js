@@ -1,12 +1,17 @@
+//requires
 const express = require('express');
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
+
+//setup the express app and the port
 const PORT = process.env.PORT || 3001;
 const app = express();
 
+//middleware. don't think this was needed at all
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
+//db connection
 const db = mysql.createConnection(
   {
     host: 'localhost',
@@ -17,6 +22,7 @@ const db = mysql.createConnection(
   console.log(`Connected to the employee_db database.`)
 );
 
+//main menu prompt
 const promptUser = () => {
   inquirer.prompt([
     {
@@ -36,6 +42,7 @@ const promptUser = () => {
     }
   ])
     .then((answer) => {
+      //switch case for main menu
       switch (answer.mainmenu) {
         case "View All Employees":
           viewAllEmployees();
@@ -62,6 +69,7 @@ const promptUser = () => {
     });
 };
 
+//view all employees
 const viewAllEmployees = () => {
   const queryText = `SELECT employee.id, 
     employee.first_name, 
@@ -80,6 +88,7 @@ const viewAllEmployees = () => {
   });
 };
 
+//view all roles
 const viewAllRoles = () => {
   const queryText = `SELECT role.id, role.title, role.salary, department.name AS department
   FROM role
@@ -91,6 +100,7 @@ const viewAllRoles = () => {
   });
 };
 
+//view all departments
 const viewAllDepartments = () => {
   const queryText = `SELECT department.id AS id, department.name AS department FROM department`;
   db.query(queryText, (error, results) => {
@@ -100,6 +110,7 @@ const viewAllDepartments = () => {
   });
 };
 
+//add employee
 const addEmployee = () => {
   inquirer.prompt([
     {
@@ -175,6 +186,7 @@ const addEmployee = () => {
     });
 };
 
+//add role
 const addRole = () => {
   const deptText = 'SELECT * FROM department'
   db.query(deptText, (err, results) => {
@@ -250,6 +262,7 @@ const addRole = () => {
   });
 };
 
+//add department
 const addDepartment = () => {
   inquirer
     .prompt([
